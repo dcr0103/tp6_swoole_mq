@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  swoole:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    ports:
+      - "9501:9501"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - thinkphp
+    environment:
+      - TZ=Asia/Shanghai
+      - APP_ENV=dev
+    working_dir: /var/www/html
+    command: php think swoole
+
+networks:
+  thinkphp:
+    external: true
+
+volumes:
+  mysql_data:
+  redis_data:

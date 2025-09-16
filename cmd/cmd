@@ -1,0 +1,51 @@
+#think-swoole 启动及状态检查
+./start-all-consumers.sh
+
+ps aux | grep swoole
+lsof -i :9501
+docker-compose exec php ps aux | grep swoole
+
+# 启动所有消费者
+./start-all-consumers.sh
+
+# 查看启动的服务
+docker exec -it tp_php_1 /bin/sh
+php think list
+php think clear
+
+
+# rabbitmq 命令
+docker-compose down
+rm -rf data/*
+docker-compose up -d
+sleep 15
+docker exec rabbitmq-server rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+docker-compose restart
+docker exec rabbitmq-server rabbitmq-plugins list | grep delayed
+
+
+#启动前自动初始化（推荐）
+
+php think rabbitmq:health  # 确保所有队列/交换机存在
+php think dlx:consumer     # 启动消费者
+
+docker-compose exec php php think rabbitmq:health -f
+
+#upervisor 守护进程（生产环境）
+#Ini#
+#深色版本
+[program:dlx_consumer]
+command=php /path/to/think dlx:consumer
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/log/dlx_consumer.log
+
+
+
+# 1. 清理 ThinkPHP 配置缓存
+docker-compose exec php php think clear
+
+# 2. 强制重建队列并修复绑定（⚠️ 会清空队列内消息）
+docker-compose exec php php think rabbitmq:health -f

@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./:/var/www/html
+    depends_on:
+      - php
+    networks:
+      - thinkphp
+
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "9000:9000"
+      - "9501:9501"
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - thinkphp
+    environment:
+      - TZ=Asia/Shanghai
+      - APP_ENV=dev
+
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: thinkphp6
+      MYSQL_USER: thinkphp
+      MYSQL_PASSWORD: thinkphp
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - thinkphp
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - thinkphp
+
+  # rabbitmq:
+    # image: rabbitmq:3-management
+    # ports:
+    #   - "5672:5672"
+    #   - "15672:15672"
+    # environment:
+    #   RABBITMQ_DEFAULT_USER: admin
+    #   RABBITMQ_DEFAULT_PASS: admin123
+    # volumes:
+    #   - rabbitmq_data:/var/lib/rabbitmq
+    # networks:
+    #   - thinkphp
+
+networks:
+  thinkphp:
+    driver: bridge
+
+volumes:
+ mysql_data:
+ redis_data:
+ rabbitmq_data:

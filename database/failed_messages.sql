@@ -1,0 +1,20 @@
+CREATE TABLE `failed_messages` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `fingerprint` varchar(64) NOT NULL COMMENT '消息唯一指纹',
+  `queue_name` varchar(255) NOT NULL COMMENT '原始队列名',
+  `exchange_name` varchar(255) DEFAULT NULL,
+  `routing_key` varchar(255) DEFAULT NULL,
+  `retry_count` int(11) NOT NULL DEFAULT '0',
+  `message_body` longtext COMMENT '原始消息体',
+  `message_data` longtext COMMENT '结构化数据',
+  `headers` longtext COMMENT '消息头',
+  `error_context` text COMMENT '错误原因',
+  `status` enum('pending','processed','ignored') NOT NULL DEFAULT 'pending',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_fingerprint` (`fingerprint`),
+  KEY `idx_status` (`status`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_queue_name` (`queue_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='死信消息表';

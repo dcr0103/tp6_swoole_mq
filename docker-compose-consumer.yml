@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  order_consumer:
+    build: .
+    container_name: order_consumer
+    volumes:
+      - .:/var/www/html
+    command: php think order:consumer
+    restart: always
+    environment:
+      RABBITMQ_HOST: 192.168.1.110
+      RABBITMQ_USER: tp5
+      RABBITMQ_PASSWORD: tp5
+      RABBITMQ_VHOST: tp5
+
+  inventory_consumer:
+    build: .
+    container_name: inventory_consumer
+    volumes:
+      - .:/var/www/html
+    command: php think inventory:consumer
+    restart: always
+    environment:
+      RABBITMQ_HOST: 192.168.1.110
+      RABBITMQ_USER: tp5
+      RABBITMQ_PASSWORD: tp5
+      RABBITMQ_VHOST: tp5
+
+  dlx_consumer:
+    build: .
+    container_name: dlx_consumer
+    volumes:
+      - .:/var/www/html
+    command: php think dlx:consumer
+    restart: always
+    environment:
+      RABBITMQ_HOST: 192.168.1.110
+      RABBITMQ_USER: tp5
+      RABBITMQ_PASSWORD: tp5
+      RABBITMQ_VHOST: tp5

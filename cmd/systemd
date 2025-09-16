@@ -1,0 +1,20 @@
+[program:order_consumer]
+command=php think order:consumer
+autostart=true
+autorestart=true
+numprocs=2
+stdout_logfile=/var/log/order_consumer.log
+
+[program:inventory_consumer]
+command=php think inventory:consumer
+autostart=true
+autorestart=true
+numprocs=2
+stdout_logfile=/var/log/inventory_consumer.log
+
+[program:dlx_consumer]
+command=php think dlx:consumer
+autostart=true
+autorestart=true
+numprocs=1
+stdout_logfile=/var/log/dlx_consumer.log
